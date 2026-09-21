@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>星痕擲骰</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">✦</span>
+        <div>
+          <p class="eyebrow">ASTRAL DICE</p>
+          <h1>星痕擲骰</h1>
+        </div>
+      </div>
+      <div class="status"><span class="status-dot"></span>準備就緒</div>
+    </header>
+
+    <section class="hero-panel" aria-label="擲骰控制區">
+      <div class="hero-copy">
+        <p class="kicker">讓機率穿越天際</p>
+        <h2>一次，擲出你的答案。</h2>
+        <p class="description">骰子會隨著星火墜落，在中央綻放成你的結果。</p>
+      </div>
+      <form class="dice-controls" id="dice-form">
+        <label for="dice-count">骰子數量</label>
+        <div class="input-row">
+          <input id="dice-count" name="dice-count" type="number" min="1" max="1000" value="12" inputmode="numeric">
+          <span class="unit">顆</span>
+          <button type="submit" id="roll-button"><span aria-hidden="true">✦</span> 擲骰</button>
+        </div>
+        <input id="dice-slider" type="range" min="1" max="1000" value="12" aria-label="骰子數量滑桿">
+        <div class="range-labels"><span>1</span><span>1000</span></div>
+        <p class="hint" id="hint">可輸入 1 至 1000 顆骰子</p>
+      </form>
+    </section>
+
+    <section class="stage" id="stage" aria-live="polite" aria-label="擲骰動畫與結果">
+      <canvas id="sky-canvas" aria-hidden="true"></canvas>
+      <video class="roll-video" id="roll-video" preload="auto" playsinline>
+        <source src="%E5%8E%9F%E7%A5%9E%E6%8A%BD%E7%8D%8E%E5%8B%95%E7%95%AB.mp4" type="video/mp4">
+      </video>
+      <div class="stage-label" id="stage-label">等待下一次墜落</div>
+      <div class="impact-ring" id="impact-ring" aria-hidden="true"></div>
+      <div class="results-panel" id="results-panel" hidden>
+        <div class="results-heading">
+          <div>
+            <p class="eyebrow">IMPACT RESULTS</p>
+            <h3 id="results-title">擲出結果</h3>
+          </div>
+          <div class="sum-block"><span>總和</span><strong id="sum-value">0</strong></div>
+        </div>
+        <div class="results-meta"><span id="results-count">0 顆骰子</span><span id="results-time">剛剛</span></div>
+        <div class="dice-results" id="dice-results"></div>
+      </div>
+    </section>
+
+    <footer class="footer-note"><span class="footer-star">✦</span> 每一次落點，都有自己的軌道</footer>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
