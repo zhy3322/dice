@@ -16,6 +16,7 @@ const impactRing = document.getElementById('impact-ring');
 let width = 0;
 let height = 0;
 let resizeTimer;
+let explosionFrame = 0;
 
 function resizeCanvas() {
   const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -44,8 +45,54 @@ function finishRoll() {
   rollVideo.classList.add('fading');
   window.setTimeout(() => {
     rollVideo.pause();
-    showResults();
+    playExplosion(showResults);
   }, 850);
+}
+
+function playExplosion(onComplete) {
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const particles = Array.from({ length: 110 }, (_, index) => {
+    const angle = index * 2.399963;
+    const speed = 1.5 + Math.random() * 4.5;
+    return {
+      x: centerX,
+      y: centerY,
+      velocityX: Math.cos(angle) * speed,
+      velocityY: Math.sin(angle) * speed,
+      size: 1 + Math.random() * 3,
+      color: index % 4 === 0 ? '#fff2bd' : index % 2 === 0 ? '#e8b84f' : '#f6d77f'
+    };
+  });
+  const start = performance.now();
+  const duration = 720;
+
+  function drawExplosion(time) {
+    const progress = Math.min((time - start) / duration, 1);
+    context.clearRect(0, 0, width, height);
+    particles.forEach((particle) => {
+      const fade = 1 - progress;
+      const x = particle.x + particle.velocityX * progress * 95;
+      const y = particle.y + particle.velocityY * progress * 95 + progress * progress * 50;
+      context.globalAlpha = fade;
+      context.fillStyle = particle.color;
+      context.beginPath();
+      context.arc(x, y, particle.size * (1 + progress), 0, Math.PI * 2);
+      context.fill();
+    });
+    context.globalAlpha = 1;
+    if (progress < 1) {
+      explosionFrame = requestAnimationFrame(drawExplosion);
+    } else {
+      context.clearRect(0, 0, width, height);
+      impactRing.classList.remove('burst');
+      void impactRing.offsetWidth;
+      impactRing.classList.add('burst');
+      onComplete();
+    }
+  }
+
+  explosionFrame = requestAnimationFrame(drawExplosion);
 }
 
 function showResults() {
@@ -58,7 +105,22 @@ function showResults() {
   values.forEach((value, index) => {
     const die = document.createElement('span');
     die.className = `die${value === 6 ? ' high' : ''}`;
-    die.textContent = value;
+    die.setAttribute('role', 'img');
+    die.setAttribute('aria-label', `${value} 點`);
+    const pipPositions = {
+      1: ['center'],
+      2: ['top-left', 'bottom-right'],
+      3: ['top-left', 'center', 'bottom-right'],
+      4: ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+      5: ['top-left', 'top-right', 'center', 'bottom-left', 'bottom-right'],
+      6: ['top-left', 'top-right', 'middle-left', 'middle-right', 'bottom-left', 'bottom-right']
+    };
+    pipPositions[value].forEach((position) => {
+      const pip = document.createElement('i');
+      pip.className = `pip ${position}`;
+      pip.setAttribute('aria-hidden', 'true');
+      die.appendChild(pip);
+    });
     die.style.animationDelay = `${Math.min(index * .012, .45)}s`;
     fragment.appendChild(die);
   });
